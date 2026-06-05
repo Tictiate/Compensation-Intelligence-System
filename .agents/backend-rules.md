@@ -1,0 +1,1 @@
+NestJS, TypeScript, Strict Mode, Prisma, and PostgreSQL

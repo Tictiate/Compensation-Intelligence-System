@@ -1,0 +1,72 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Company {
+  id            String               @id @default(uuid())
+  name          String               @unique
+  website       String?
+  aliases       String[]             @default([])
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+  levels        CompanyLevel[]
+  compensations CompensationRecord[]
+
+  @@map("companies")
+}
+
+model StandardLevel {
+  id            String         @id @default(uuid())
+  name          String         // e.g., "Entry-Level", "Mid-Level", "Senior", "Staff"
+  code          String         @unique // e.g., "L1", "L2", "L3", "L4"
+  rank          Int            @unique // Order rank for comparison
+  companyLevels CompanyLevel[]
+
+  @@map("standard_levels")
+}
+
+model CompanyLevel {
+  id              String               @id @default(uuid())
+  companyId       String
+  standardLevelId String?
+  name            String               // e.g., "IC4", "L4", "E4"
+  rank            Int                  // Ordinal rank within company hierarchy (e.g. 1, 2, 3)
+  description     String?
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+  company         Company              @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  standardLevel   StandardLevel?       @relation(fields: [standardLevelId], references: [id], onDelete: SetNull)
+  compensations   CompensationRecord[]
+
+  @@unique([companyId, name])
+  @@unique([companyId, rank])
+  @@map("company_levels")
+}
+
+model CompensationRecord {
+  id                String       @id @default(uuid())
+  companyId         String
+  levelId           String
+  jobTitle          String       // e.g., "Software Engineer" (Levels matter more, but title is captured)
+  baseSalary        Decimal      @db.Decimal(12, 2)
+  bonus             Decimal?     @db.Decimal(12, 2)
+  stock             Decimal?     @db.Decimal(12, 2) // Annualized stock/equity value
+  currency          String       @default("USD")
+  location          String       // e.g., "San Francisco, CA"
+  yearsOfExperience Float        // Total years of experience
+  yearsAtCompany    Float        // Years at the current company
+  employmentType    String       @default("Full-time") // e.g., Full-time, Contractor
+  submittedAt       DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+  company           Company      @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  level             CompanyLevel @relation(fields: [levelId], references: [id], onDelete: Restrict)
+
+  @@index([companyId, levelId])
+  @@index([location])
+  @@index([jobTitle])
+  @@map("compensation_records")
+}

@@ -1,5 +1,7 @@
 # Compensation Intelligence System - Backend API
 
+**Live API:** [https://compensation-intelligence-system-production-f5b6.up.railway.app](https://compensation-intelligence-system-production-f5b6.up.railway.app)
+
 A production-ready Node.js backend built with [NestJS](https://nestjs.com/), [Prisma 7](https://www.prisma.io/), and **PostgreSQL**.
 
 This system features a highly robust compensation data ingestion pipeline. It includes an intelligent normalization engine to collapse messy corporate aliases into canonical identities, and a high-performance aggregation API that utilizes native PostgreSQL percentile functions (`percentile_cont`) for compensation benchmarks.

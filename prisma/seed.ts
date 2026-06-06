@@ -6,7 +6,7 @@ import 'dotenv/config';
 import { Pool } from 'pg';
 import { PrismaPg } from '@prisma/adapter-pg';
 
-const connectionString = 'postgres://postgres:postgres@localhost:51214/template1?sslmode=disable';
+const connectionString = process.env.DATABASE_URL;
 const pool = new Pool({ connectionString });
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
@@ -35,7 +35,7 @@ async function main() {
   
   let insertedCount = 0;
 
-  for (let i = 0; i < 100; i++) {
+  for (let i = 0; i < 20; i++) {
     const rawName = messyNames[i % messyNames.length];
     
     // Normalize using our engine!
@@ -46,7 +46,7 @@ async function main() {
       baseSalary: 100000 + Math.random() * 50000,
       bonus: Math.random() > 0.5 ? 10000 + Math.random() * 5000 : undefined,
       stock: Math.random() > 0.5 ? 20000 + Math.random() * 10000 : undefined,
-      location: 'San Francisco, CA',
+      location: 'Bangalore, India',
       yearsOfExperience: 3,
       yearsAtCompany: 1,
     });
@@ -89,6 +89,7 @@ async function main() {
     });
 
     insertedCount++;
+    if (insertedCount % 5 === 0) console.log(`Seeded ${insertedCount} / 20...`);
   }
 
   console.log(`✅ Seeded ${insertedCount} compensation records!`);
